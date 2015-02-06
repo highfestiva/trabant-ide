@@ -10,8 +10,8 @@
 
 // Version numbers and dates
 #define VERSION_SCITE "3.5.3"
-#define VERSION_WORDS 3, 5, 3, 0
-#define COPYRIGHT_DATES "December 1998-January 2015"
+#define VERSION_WORDS 3, 5, 3, 1
+#define COPYRIGHT_DATES "December 1998-February 2015"
 #define COPYRIGHT_YEARS "1998-2015"
 
 // Menu IDs.
@@ -179,6 +179,7 @@
 //#define IDM_BUFFEREDDRAW	491
 
 // Buffers
+#define IDM_ESCAPE		499
 #define IDM_PREVFILE			501
 #define IDM_NEXTFILE			502
 #define IDM_CLOSEALL			503

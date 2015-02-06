@@ -13,7 +13,7 @@
 DIR_BIN=..\bin
 
 PROG=$(DIR_BIN)\SciTE.exe
-PROGSTATIC=$(DIR_BIN)\Sc1.exe
+PROGSTATIC=$(DIR_BIN)\TrabantIDE.exe
 DLLS=$(DIR_BIN)\Scintilla.dll $(DIR_BIN)\SciLexer.dll
 
 WIDEFLAGS=-DUNICODE -D_UNICODE
@@ -86,7 +86,7 @@ LEXLIB=..\..\scintilla\win32\Lexers.lib
 
 OBJSSTATIC=\
 	$(SHAREDOBJS) \
-	Sc1.obj \
+	TrabantIDE.obj \
 	..\..\scintilla\win32\Accessor.obj \
 	..\..\scintilla\win32\AutoComplete.obj \
 	..\..\scintilla\win32\CallTip.obj \
@@ -224,13 +224,13 @@ $(DIR_BIN)\abbrev.properties: ..\src\abbrev.properties
 SciTERes.res: SciTERes.rc ..\src\SciTE.h SciTE.exe.manifest
 	$(RC) $(INCLUDEDIRS) -fo$@ SciTERes.rc
 
-Sc1Res.res: SciTERes.rc ..\src\SciTE.h SciTE.exe.manifest
+TrabantIDERes.res: SciTERes.rc ..\src\SciTE.h SciTE.exe.manifest
 	$(RC) $(INCLUDEDIRS) -dSTATIC_BUILD -fo$@ SciTERes.rc
 
 $(PROG): $(OBJS) SciTERes.res
 	$(LD) $(LDFLAGS) -OUT:$@ $** $(LIBS)
 
-$(PROGSTATIC): $(OBJSSTATIC) $(LEXLIB) Sc1Res.res
+$(PROGSTATIC): $(OBJSSTATIC) $(LEXLIB) TrabantIDERes.res
 	$(LD) $(LDFLAGS) -OUT:$@ $** $(LIBS)
 
 # Define how to build all the objects and what they depend on
@@ -246,7 +246,7 @@ $(PROGSTATIC): $(OBJSSTATIC) $(LEXLIB) Sc1Res.res
 {..\lua\src\lib}.c.obj::
 	$(CXX) $(CCFLAGS) -c $<
 
-Sc1.obj: SciTEWin.cxx
+TrabantIDE.obj: SciTEWin.cxx
 	$(CXX) $(CXXFLAGS) -DSTATIC_BUILD -c $(NAME)$@ SciTEWin.cxx
 
 # Dependencies
@@ -302,7 +302,7 @@ SciTEWin.obj: \
 	../src/Extender.h \
 	DirectorExtension.h \
 	../src/LuaExtension.h
-Sc1.obj: \
+TrabantIDE.obj: \
 	SciTEWin.cxx \
 	SciTEWin.h \
 	../../scintilla/include/Scintilla.h \

@@ -1299,6 +1299,7 @@ void SciTEBase::SetPropertiesInitial() {
 	sbVisible = props.GetInt("statusbar.visible");
 	tbVisible = props.GetInt("toolbar.visible");
 	tabVisible = props.GetInt("tabbar.visible");
+	tabHotkeysVisible = props.GetInt("tabbar.hotkeys.visible");
 	tabMultiLine = props.GetInt("tabbar.multiline");
 	lineNumbers = props.GetInt("line.margin.visible");
 	margin = props.GetInt("margin.width");

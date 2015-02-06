@@ -23,7 +23,7 @@
 #endif
 
 #ifdef STATIC_BUILD
-const GUI::gui_char appName[] = GUI_TEXT("Sc1");
+const GUI::gui_char appName[] = GUI_TEXT("TrabantIDE");
 #else
 const GUI::gui_char appName[] = GUI_TEXT("SciTE");
 #endif
@@ -408,7 +408,7 @@ static FilePath GetSciTEPath(FilePath home) {
 		// Remove the SciTE.exe
 		GUI::gui_char *lastSlash = wcsrchr(path, pathSepChar);
 		if (lastSlash)
-			*lastSlash = '\0';
+			wcscpy(&lastSlash[1], L"settings");
 		return FilePath(path);
 	}
 }

@@ -1,2 +1,2 @@
-del/q ..\Sc1.exe
-upx --best --force -o ..\Sc1.exe bin\Sc1.exe
+del/q ..\TrabantIDE.exe
+upx --best --force -o ..\TrabantIDE.exe bin\TrabantIDE.exe

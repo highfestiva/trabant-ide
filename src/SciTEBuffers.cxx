@@ -1142,7 +1142,7 @@ void SciTEBase::SetBuffersMenu() {
 			GUI::gui_string titleTab;
 
 #if defined(_WIN32) || defined(GTK)
-			if (pos < 10) {
+			if (pos < 10 && tabHotkeysVisible) {
 				GUI::gui_string sPos = GUI::StringFromInteger((pos + 1) % 10);
 				GUI::gui_string sHotKey = GUI_TEXT("&") + sPos + GUI_TEXT(" ");
 				entry = sHotKey;	// hotkey 1..0

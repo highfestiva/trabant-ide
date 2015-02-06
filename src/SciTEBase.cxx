@@ -113,6 +113,7 @@ SciTEBase::SciTEBase(Extension *ext) : apis(true), extender(ext) {
 	tabVisible = false;
 	tabHideOne = false;
 	tabMultiLine = false;
+	tabHotkeysVisible = true;
 	sbNum = 1;
 	visHeightTools = 0;
 	visHeightTab = 0;
@@ -3342,6 +3343,14 @@ void SciTEBase::MenuCommand(int cmdID, int source) {
 
 	case IDM_TOGGLEOUTPUT:
 		ToggleOutputVisible();
+		CheckMenus();
+		break;
+
+	case IDM_ESCAPE:
+		if (heightOutput > 0) {
+			ToggleOutputVisible();
+		}
+		StopExecute();
 		CheckMenus();
 		break;
 

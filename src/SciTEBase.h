@@ -408,6 +408,7 @@ protected:
 	bool tabVisible;
 	bool tabHideOne; // Hide tab bar if one buffer is opened only
 	bool tabMultiLine;
+	bool tabHotkeysVisible;
 	bool sbVisible;	///< @c true if status bar is visible.
 	std::string sbValue;	///< Status bar text.
 	int sbNum;	///< Number of the currently displayed status bar information.

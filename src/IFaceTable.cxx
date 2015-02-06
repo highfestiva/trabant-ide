@@ -189,6 +189,7 @@ static IFaceConstant ifaceConstants[] = {
 	{"IDM_EOL_CR",431},
 	{"IDM_EOL_CRLF",430},
 	{"IDM_EOL_LF",432},
+	{"IDM_ESCAPE",499},
 	{"IDM_EXPAND",235},
 	{"IDM_EXPAND_ENSURECHILDRENVISIBLE",238},
 	{"IDM_FILER",114},
