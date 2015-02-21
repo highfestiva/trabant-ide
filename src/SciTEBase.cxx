@@ -166,7 +166,7 @@ SciTEBase::SciTEBase(Extension *ext) : apis(true), extender(ext) {
 	marginWidth = marginWidthDefault;
 	foldMargin = true;
 	foldMarginWidth = foldMarginWidthDefault;
-	lineNumbers = false;
+	lineNumbers = true;
 	lineNumbersWidth = lineNumbersWidthDefault;
 	lineNumbersExpand = false;
 
@@ -183,6 +183,7 @@ SciTEBase::SciTEBase(Extension *ext) : apis(true), extender(ext) {
 	propsStatus.superPS = &props;
 
 	needReadProperties = false;
+	goAfterExecute = false;
 	quitting = false;
 
 	timerMask = 0;
@@ -249,6 +250,10 @@ std::string SciTEBase::GetTranslationToAbout(const char * const propname, bool r
 	// On GTK+, localiser.Text always converts to UTF-8.
 	return localiser.Text(propname, retainIfNotFound);
 #endif
+}
+
+void SciTEBase::ViewLineNumbers(bool view) {
+	lineNumbers = view;
 }
 
 void SciTEBase::ViewWhitespace(bool view) {
@@ -3474,24 +3479,12 @@ void SciTEBase::MenuCommand(int cmdID, int source) {
 		break;
 
 	case IDM_GO: {
-			if (SaveIfUnsureForBuilt() != saveCancelled) {
-				SelectionIntoProperties();
-				int flags = 0;
-
-				if (!jobQueue.isBuilt) {
-					std::string buildcmd = props.GetNewExpandString("command.go.needs.", FileNameExt().AsUTF8().c_str());
-					AddCommand(buildcmd, "",
-					        SubsystemType("command.go.needs.subsystem."));
-					if (buildcmd.length() > 0) {
-						jobQueue.isBuilding = true;
-						flags |= jobForceQueue;
-					}
-				}
-				AddCommand(props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()), "",
-				        SubsystemType("command.go.subsystem."), "", flags);
-				if (jobQueue.HasCommandToRun())
-					Execute();
+			if (jobQueue.IsExecuting()) {
+				goAfterExecute = true;
+				StopExecute();
+				break;
 			}
+			Go();
 		}
 		break;
 
@@ -3627,6 +3620,28 @@ void SciTEBase::MenuCommand(int cmdID, int source) {
 			SetOverrideLanguage(cmdID - IDM_LANGUAGE);
 		}
 		break;
+	}
+}
+
+void SciTEBase::Go() {
+	goAfterExecute = false;
+	if (SaveIfUnsureForBuilt() != saveCancelled) {
+		SelectionIntoProperties();
+		int flags = 0;
+
+		if (!jobQueue.isBuilt) {
+			std::string buildcmd = props.GetNewExpandString("command.go.needs.", FileNameExt().AsUTF8().c_str());
+			AddCommand(buildcmd, "",
+				SubsystemType("command.go.needs.subsystem."));
+			if (buildcmd.length() > 0) {
+				jobQueue.isBuilding = true;
+				flags |= jobForceQueue;
+			}
+		}
+		AddCommand(props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()), "",
+			SubsystemType("command.go.subsystem."), "", flags);
+		if (jobQueue.HasCommandToRun())
+			Execute();
 	}
 }
 
@@ -4066,7 +4081,7 @@ void SciTEBase::CheckMenus() {
 	        props.GetWild("command.build.", FileNameExt().AsUTF8().c_str()).size() != 0);
 	EnableAMenuItem(IDM_CLEAN, !jobQueue.IsExecuting() &&
 	        props.GetWild("command.clean.", FileNameExt().AsUTF8().c_str()).size() != 0);
-	EnableAMenuItem(IDM_GO, !jobQueue.IsExecuting() &&
+	EnableAMenuItem(IDM_GO, //!jobQueue.IsExecuting() &&
 	        props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()).size() != 0);
 	EnableAMenuItem(IDM_OPENDIRECTORYPROPERTIES, props.GetInt("properties.directory.enable") != 0);
 	for (int toolItem = 0; toolItem < toolMax; toolItem++)

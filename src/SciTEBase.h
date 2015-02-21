@@ -431,6 +431,7 @@ protected:
 	enum { toolMax = 50 };
 	Extension *extender;
 	bool needReadProperties;
+	bool goAfterExecute;
 	bool quitting;
 
 	int timerMask;
@@ -782,6 +783,7 @@ protected:
 	virtual void CopyPath() {}
 	void SetLineNumberWidth();
 	void MenuCommand(int cmdID, int source = 0);
+	void Go();
 	void FoldChanged(int line, int levelNow, int levelPrev);
 	void FoldChanged(int position);
 	void Expand(int &line, bool doExpand, bool force = false,
@@ -842,6 +844,7 @@ protected:
 	void ToolsMenu(int item);
 
 	void AssignKey(int key, int mods, int cmd);
+	void ViewLineNumbers(bool view);
 	void ViewWhitespace(bool view);
 	void SetAboutMessage(GUI::ScintillaWindow &wsci, const char *appTitle);
 	void SetImportMenu();

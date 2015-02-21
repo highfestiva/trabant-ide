@@ -623,6 +623,9 @@ void SciTEWin::Command(WPARAM wParam, LPARAM lParam) {
 			CheckMenus();
 			jobQueue.ClearJobs();
 			CheckReload();
+			if (goAfterExecute) {
+				Go();
+			}
 		}
 		break;
 
@@ -969,26 +972,30 @@ DWORD SciTEWin::ExecuteOne(const Job &jobToRun) {
 			}
 
 			if (jobQueue.SetCancelFlag(0)) {
-				if (WAIT_OBJECT_0 != ::WaitForSingleObject(pi.hProcess, 500)) {
+				if (WAIT_OBJECT_0 != ::WaitForSingleObject(pi.hProcess, 0)) {
 					// We should use it only if the GUI process is stuck and
 					// don't answer to a normal termination command.
 					// This function is dangerous: dependent DLLs don't know the process
 					// is terminated, and memory isn't released.
-					OutputAppendStringSynchronised("\n>Process failed to respond; forcing abrupt termination...\n");
-					::TerminateProcess(pi.hProcess, 1);
+					//OutputAppendStringSynchronised("\n>Process failed to respond; forcing abrupt termination...\n");
+					::TerminateProcess(pi.hProcess, 15151);	// Special sauce.
 				}
 				running = false;
 				cancelled = true;
 			}
 		}
 
-		if (WAIT_OBJECT_0 != ::WaitForSingleObject(pi.hProcess, 1000)) {
-			OutputAppendStringSynchronised("\n>Process failed to respond; forcing abrupt termination...");
+		if (WAIT_OBJECT_0 != ::WaitForSingleObject(pi.hProcess, 0)) {
+			//OutputAppendStringSynchronised("\n>Process failed to respond; forcing abrupt termination...");
 			::TerminateProcess(pi.hProcess, 2);
 		}
 		::GetExitCodeProcess(pi.hProcess, &exitcode);
 		std::ostringstream stExitMessage;
-		stExitMessage << ">Exit code: " << exitcode;
+		if (cancelled) {
+			stExitMessage << ">User terminated.";
+		} else {
+			stExitMessage << ">Exit code: " << exitcode;
+		}
 		if (jobQueue.TimeCommands()) {
 			stExitMessage << "    Time: ";
 			stExitMessage << std::setprecision(4) << cmdWorker.commandTime.Duration();
@@ -1048,12 +1055,14 @@ void SciTEWin::ProcessExecute() {
 			jobQueue.isBuilt = true;
 	}
 
-	// Move selection back to beginning of this run so that F4 will go
-	// to first error of this run.
-	// scroll and return only if output.scroll equals
-	// one in the properties file
-	if ((cmdWorker.outputScroll == 1) && returnOutputToCommand)
-		wOutput.Send(SCI_GOTOPOS, cmdWorker.originalEnd, 0);
+	if (cmdWorker.exitStatus != 15151) {	// Special sauce.
+		// Move selection back to beginning of this run so that F4 will go
+		// to first error of this run.
+		// scroll and return only if output.scroll equals
+		// one in the properties file
+		if ((cmdWorker.outputScroll == 1) && returnOutputToCommand)
+			wOutput.Send(SCI_GOTOPOS, cmdWorker.originalEnd, 0);
+	}
 	returnOutputToCommand = true;
 	PostOnMainThread(WORK_EXECUTE, &cmdWorker);
 }
@@ -1181,7 +1190,7 @@ void SciTEWin::StopExecute() {
 		char stop[] = "\032";
 		DWORD bytesWrote = 0;
 		::WriteFile(hWriteSubProcess, stop, static_cast<DWORD>(strlen(stop)), &bytesWrote, NULL);
-		Sleep(500L);
+		//Sleep(500L);	Doesn't work anyway...
 	}
 
 #ifdef USE_CONSOLE_EVENT
@@ -1196,7 +1205,7 @@ void SciTEWin::StopExecute() {
 			OutputAppendStringSynchronised(sError.c_str());
 			OutputAppendStringSynchronised("\n");
 		}
-		Sleep(100L);
+		//Sleep(100L);	Doesn't work anyway...
 	}
 #endif
 

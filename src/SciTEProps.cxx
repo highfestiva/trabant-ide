@@ -1393,6 +1393,7 @@ void SciTEBase::ReadPropertiesInitial() {
 			Redraw();
 		}
 	}
+	ViewLineNumbers(props.GetInt("view.linenumbers"));
 	ViewWhitespace(props.GetInt("view.whitespace"));
 	wEditor.Call(SCI_SETINDENTATIONGUIDES, props.GetInt("view.indentation.guides") ?
 		indentExamine : SC_IV_NONE);
