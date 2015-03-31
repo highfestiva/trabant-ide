@@ -1,3 +1,7 @@
+TrabantIDE is SciTE with a couple of minimal changes. Mainly I've decluttered
+by removing a bunch of menu alternatives that I didn't need. Here follows the
+original README.
+
 README for building of Scintilla and SciTE
 
 Scintilla can be built by itself.
