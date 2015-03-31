@@ -2998,7 +2998,11 @@ void SciTEBase::MenuCommand(int cmdID, int source) {
 		WindowSetFocus(wEditor);
 		break;
 	case IDM_SAVEALL:
-		SaveAllBuffers(true);
+		if (SaveAllBuffers(true) != saveCancelled) {
+			if (props.GetInt("sync.after.save")) {
+				RemoteSync();
+			}
+		}
 		break;
 	case IDM_SAVEAS:
 		SaveAsDialog();
@@ -3479,12 +3483,27 @@ void SciTEBase::MenuCommand(int cmdID, int source) {
 		break;
 
 	case IDM_GO: {
-			if (jobQueue.IsExecuting()) {
-				goAfterExecute = true;
-				StopExecute();
-				break;
+			DoGo("localhost");
+		}
+		break;
+
+	case IDM_GO_REMOTE: {
+			const std::string remotehost = props.GetString("sync.remote.host");
+			if (remotehost.empty()) {
+				ShowRemoteSyncDlg(true);
+			} else {
+				DoGo(remotehost);
 			}
-			Go();
+		}
+		break;
+
+	case IDM_SYNC_REMOTE_ASK: {
+			ShowRemoteSyncDlg(false);
+		}
+		break;
+
+	case IDM_SYNC_REMOTE: {
+			RemoteSync();
 		}
 		break;
 
@@ -3623,6 +3642,16 @@ void SciTEBase::MenuCommand(int cmdID, int source) {
 	}
 }
 
+void SciTEBase::DoGo(const std::string& host) {
+	props.Set("trabant.simulator.host", host.c_str());
+	if (jobQueue.IsExecuting()) {
+		goAfterExecute = true;
+		StopExecute();
+	} else {
+		Go();
+	}
+}
+
 void SciTEBase::Go() {
 	goAfterExecute = false;
 	if (SaveIfUnsureForBuilt() != saveCancelled) {
@@ -3640,6 +3669,23 @@ void SciTEBase::Go() {
 		}
 		AddCommand(props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()), "",
 			SubsystemType("command.go.subsystem."), "", flags);
+		if (jobQueue.HasCommandToRun()) {
+			if (props.GetString("trabant.simulator.host") != "localhost") {
+				if (props.GetInt("sync.after.remote.run")) {
+					AddCommand(props.GetString("command.sync"), "../sync", SubsystemType("command.sync.subsystem."), "", 0);
+				}
+			}
+			Execute();
+		}
+	}
+}
+
+void SciTEBase::RemoteSync() {
+	const std::string remotehost = props.GetString("sync.remote.host");
+	if (remotehost.empty()) {
+		ShowRemoteSyncDlg(false);
+	} else {
+		AddCommand(props.GetString("command.sync"), "../sync", SubsystemType("command.sync.subsystem."), "", 0);
 		if (jobQueue.HasCommandToRun())
 			Execute();
 	}
@@ -4082,6 +4128,8 @@ void SciTEBase::CheckMenus() {
 	EnableAMenuItem(IDM_CLEAN, !jobQueue.IsExecuting() &&
 	        props.GetWild("command.clean.", FileNameExt().AsUTF8().c_str()).size() != 0);
 	EnableAMenuItem(IDM_GO, //!jobQueue.IsExecuting() &&
+	        props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()).size() != 0);
+	EnableAMenuItem(IDM_GO_REMOTE, //!jobQueue.IsExecuting() &&
 	        props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()).size() != 0);
 	EnableAMenuItem(IDM_OPENDIRECTORYPROPERTIES, props.GetInt("properties.directory.enable") != 0);
 	for (int toolItem = 0; toolItem < toolMax; toolItem++)
@@ -4677,6 +4725,10 @@ bool SciTEBase::ProcessCommandLine(GUI::gui_string &args, int phase) {
 				RestoreRecentMenu();
 			if (props.GetInt("buffers") && props.GetInt("save.session"))
 				RestoreSession();
+		}
+		// Possibly first time, so open all the sample code.
+		if (filePath.IsUntitled() && buffers.length == 1 && !buffers.buffers[0].isDirty) {
+			OpenAllPrototypes();
 		}
 		// No open file after session load so create empty document.
 		if (filePath.IsUntitled() && buffers.length == 1 && !buffers.buffers[0].isDirty) {

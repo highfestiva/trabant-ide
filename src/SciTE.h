@@ -118,6 +118,9 @@
 #define IDM_COMPILE			301
 #define IDM_BUILD			302
 #define IDM_GO				303
+#define IDM_GO_REMOTE			347
+#define IDM_SYNC_REMOTE_ASK		348
+#define IDM_SYNC_REMOTE			349
 #define IDM_STOPEXECUTE		304
 #define IDM_FINISHEDEXECUTE	305
 #define IDM_NEXTMSG			306
@@ -252,6 +255,10 @@
 #define IDFINDINSTYLE		250
 #define IDFINDSTYLE			251
 #define IDCONVERT			252
+
+// high_festiva was here
+#define IDREMOTEHOST		290
+#define IDREMOTERUN		291
 
 #define IDPARAMSTART		300
 

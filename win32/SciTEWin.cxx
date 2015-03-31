@@ -169,6 +169,7 @@ SciTEWin::SciTEWin(Extension *ext) : SciTEBase(ext) {
 	modalParameters = false;
 	filterDefault = 1;
 	staticBuild = false;
+	remoteIsRun = false;
 	menuSource = 0;
 
 	hWriteSubProcess = NULL;
@@ -711,7 +712,8 @@ void SciTEWin::ResetExecution() {
 
 void SciTEWin::ExecuteNext() {
 	cmdWorker.icmd++;
-	if (cmdWorker.icmd < jobQueue.commandCurrent && cmdWorker.icmd < jobQueue.commandMax && cmdWorker.exitStatus == 0) {
+	const bool okExit = (cmdWorker.exitStatus == 0 || cmdWorker.exitStatus == 15151);
+	if (cmdWorker.icmd < jobQueue.commandCurrent && cmdWorker.icmd < jobQueue.commandMax && okExit) {
 		Execute();
 	} else {
 		ResetExecution();

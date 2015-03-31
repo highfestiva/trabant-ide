@@ -136,6 +136,9 @@ bool SciTEWin::ModelessHandler(MSG *pmsg) {
 	if (DialogHandled(wFindInFiles.GetID(), pmsg)) {
 		return true;
 	}
+	if (DialogHandled(wRemoteSync.GetID(), pmsg)) {
+		return true;
+	}
 	if (wParameters.GetID()) {
 		// Allow commands, such as Ctrl+1 to be active while the Parameters dialog is
 		// visible so that a group of commands can be easily run with differing parameters.
@@ -1177,6 +1180,7 @@ void SciTEWin::FillCombos(Dialog &dlg) {
 	dlg.FillComboFromMemory(IDFINDWHAT, memFinds, true);
 	dlg.FillComboFromMemory(IDFILES, memFiles, true);
 	dlg.FillComboFromMemory(IDDIRECTORY, memDirectory, true);
+	dlg.FillComboFromMemory(IDREMOTEHOST, memRemoteHosts, true);
 }
 
 BOOL SciTEWin::GrepMessage(HWND hDlg, UINT message, WPARAM wParam) {
@@ -1727,4 +1731,69 @@ void SciTEWin::AboutDialogWithBuild(int staticBuild_) {
 	DoDialog(hInstance, TEXT("About"), MainHWND(),
 	         reinterpret_cast<DLGPROC>(AboutDlg));
 	WindowSetFocus(wEditor);
+}
+
+
+BOOL SciTEWin::RemoteSyncMessage(HWND hDlg, UINT message, WPARAM wParam) {
+	if (WM_SETFONT == message || WM_NCDESTROY == message)
+		return FALSE;
+	Dialog dlg(hDlg);
+
+	switch (message) {
+
+	case WM_INITDIALOG:
+		LocaliseDialog(hDlg);
+		FillCombos(dlg);
+		dlg.SetItemTextU(IDREMOTEHOST, props.GetString("sync.remote.host"));
+		return TRUE;
+
+	case WM_CLOSE:
+		::SendMessage(hDlg, WM_COMMAND, IDCANCEL, 0);
+		break;
+
+	case WM_COMMAND:
+		int cmd = ControlIDOfWParam(wParam);
+		if (cmd == IDCANCEL) {
+			::EndDialog(hDlg, IDCANCEL);
+			wRemoteSync.Destroy();
+			return FALSE;
+
+		} else if (cmd == IDOK || cmd == IDREMOTERUN) {
+			std::string remotehost = dlg.ItemTextU(IDREMOTEHOST);
+			if (remotehost.empty()) {
+				return FALSE;
+			}
+			props.Set("sync.remote.host", remotehost.c_str());
+			memRemoteHosts.Insert(remotehost);
+			FillCombos(dlg);
+			if (cmd == IDREMOTERUN) {
+				DoGo(remotehost);
+			} else {
+				RemoteSync();
+			}
+			::EndDialog(hDlg, cmd);
+			wRemoteSync.Destroy();
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+BOOL CALLBACK SciTEWin::RemoteSyncDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+	return Caller(hDlg, message, lParam)->RemoteSyncMessage(hDlg, message, wParam);
+}
+
+void SciTEWin::ShowRemoteSyncDlg(bool isRun) {
+	remoteIsRun = isRun;
+	if (wRemoteSync.Created()) {
+		HWND hDlg = reinterpret_cast<HWND>(wRemoteSync.GetID());
+		Dialog dlg(hDlg);
+		dlg.SetItemTextU(IDFINDWHAT, findWhat);
+		::SetFocus(hDlg);
+		return;
+	}
+	wRemoteSync = ::CreateDialogParam(hInstance, TEXT("RemoteSync"), MainHWND(),
+		reinterpret_cast<DLGPROC>(RemoteSyncDlg), reinterpret_cast<sptr_t>(this));
+	wRemoteSync.Show();
 }

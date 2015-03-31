@@ -179,6 +179,7 @@ protected:
 	bool modalParameters;
 	int filterDefault;
 	bool staticBuild;
+	bool remoteIsRun;
 	int menuSource;
 	std::deque<GUI::gui_string> dropFilesQueue;
 
@@ -209,6 +210,7 @@ protected:
 	GUI::Window wFindInFiles;
 	GUI::Window wFindReplace;
 	GUI::Window wParameters;
+	GUI::Window wRemoteSync;
 
 	ContentWin contents;
 	BackgroundStrip backgroundStrip;
@@ -348,6 +350,10 @@ protected:
 	BOOL AboutMessage(HWND hDlg, UINT message, WPARAM wParam);
 	static BOOL CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	void AboutDialogWithBuild(int staticBuild_);
+
+	BOOL RemoteSyncMessage(HWND hDlg, UINT message, WPARAM wParam);
+	static BOOL CALLBACK RemoteSyncDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+	virtual void ShowRemoteSyncDlg(bool isRun);
 
 	void RestorePosition();
 

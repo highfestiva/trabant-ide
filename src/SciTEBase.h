@@ -293,6 +293,7 @@ public:
 	bool closeFind;
 	ComboMemory memFinds;
 	ComboMemory memReplaces;
+	ComboMemory memRemoteHosts;
 
 	bool focusOnReplace;
 
@@ -576,6 +577,7 @@ protected:
 	void RestoreRecentMenu();
 	void RestoreFromSession(const Session &session);
 	void RestoreSession();
+	void OpenAllPrototypes();
 	void SaveSessionFile(const GUI::gui_char *sessionName);
 	virtual void GetWindowPosition(int *left, int *top, int *width, int *height, int *maximize) = 0;
 	void SetIndentSettings();
@@ -783,6 +785,9 @@ protected:
 	virtual void CopyPath() {}
 	void SetLineNumberWidth();
 	void MenuCommand(int cmdID, int source = 0);
+	virtual void ShowRemoteSyncDlg(bool isRun) = 0;
+	void RemoteSync();
+	void DoGo(const std::string& host);
 	void Go();
 	void FoldChanged(int line, int levelNow, int levelPrev);
 	void FoldChanged(int position);

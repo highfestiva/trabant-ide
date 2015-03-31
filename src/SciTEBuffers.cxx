@@ -615,6 +615,17 @@ void SciTEBase::RestoreSession() {
 				break;
 			memReplaces.AppendList(propStr.c_str());
 		}
+
+		for (int i = 0;; i++) {
+			std::string propKey = IndexPropKey("sync", i, "remotehost");
+			std::string propStr = propsSession.GetString(propKey.c_str());
+			if (propStr == "")
+				break;
+			memRemoteHosts.AppendList(propStr.c_str());
+			if (i == 0) {
+				props.Set("sync.remote.host", propStr.c_str());
+			}
+		}
 	}
 
 	// Comment next line if you don't want to close all buffers before restoring session
@@ -662,6 +673,25 @@ void SciTEBase::RestoreSession() {
 	}
 
 	RestoreFromSession(session);
+}
+
+void SciTEBase::OpenAllPrototypes() {
+	Session session;
+	FilePath rootDir(GUI_TEXT("prototypes"));
+	FilePathSet directories;
+	FilePathSet files;
+	rootDir.List(directories, files);
+	int cnt = std::min((int)files.size(), (int)bufferMax);
+	for (int i = 0; i < cnt; i++) {
+		BufferState bufferState;
+		bufferState.Set(files[i]);
+		bufferState.selection.anchor = -1;
+		bufferState.selection.position = bufferState.selection.anchor;
+		session.buffers.push_back(bufferState);
+	}
+	if (cnt > 0) {
+		RestoreFromSession(session);
+	}
 }
 
 void SciTEBase::SaveSessionFile(const GUI::gui_char *sessionName) {
@@ -724,10 +754,19 @@ void SciTEBase::SaveSessionFile(const GUI::gui_char *sessionName) {
 		mem = memReplaces.AsVector();
 		if (!mem.empty()) {
 			fprintf(sessionFile, "\n");
-			mem = memReplaces.AsVector();
 			it = mem.begin();
 			for (int i = 0; it != mem.end(); i++, ++it) {
 				propKey = IndexPropKey("search", i, "replacewith");
+				fprintf(sessionFile, "%s=%s\n", propKey.c_str(), (*it).c_str());
+			}
+		}
+
+		mem = memRemoteHosts.AsVector();
+		if (!mem.empty()) {
+			fprintf(sessionFile, "\n");
+			it = mem.begin();
+			for (int i = 0; it != mem.end(); i++, ++it) {
+				propKey = IndexPropKey("sync", i, "remotehost");
 				fprintf(sessionFile, "%s=%s\n", propKey.c_str(), (*it).c_str());
 			}
 		}
