@@ -1172,6 +1172,7 @@ void SciTEWin::PerformGrep() {
 			   jobCLI, findInput, flags);
 	}
 	if (jobQueue.HasCommandToRun()) {
+		returnOutputToCommand = true;
 		Execute();
 	}
 }

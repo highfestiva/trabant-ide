@@ -3654,6 +3654,7 @@ void SciTEBase::DoGo(const std::string& host) {
 
 void SciTEBase::Go() {
 	goAfterExecute = false;
+	returnOutputToCommand = false;
 	if (SaveIfUnsureForBuilt() != saveCancelled) {
 		SelectionIntoProperties();
 		int flags = 0;

@@ -1065,7 +1065,7 @@ void SciTEWin::ProcessExecute() {
 		if ((cmdWorker.outputScroll == 1) && returnOutputToCommand)
 			wOutput.Send(SCI_GOTOPOS, cmdWorker.originalEnd, 0);
 	}
-	returnOutputToCommand = true;
+	returnOutputToCommand = false;
 	PostOnMainThread(WORK_EXECUTE, &cmdWorker);
 }
 
