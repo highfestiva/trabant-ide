@@ -3682,6 +3682,9 @@ void SciTEBase::Go() {
 }
 
 void SciTEBase::RemoteSync() {
+	if (SaveIfUnsureForBuilt() == saveCancelled) {
+		return;
+	}
 	const std::string remotehost = props.GetString("sync.remote.host");
 	if (remotehost.empty()) {
 		ShowRemoteSyncDlg(false);
