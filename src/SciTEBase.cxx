@@ -3511,6 +3511,19 @@ void SciTEBase::MenuCommand(int cmdID, int source) {
 		StopExecute();
 		break;
 
+	case IDM_EXPORT_EXE: {
+			ExportExe();
+		}
+		break;
+
+	case IDM_EXPORT_GIST: {
+			if (SaveIfUnsureForBuilt() == saveCancelled) {
+				return;
+			}
+			ShowGistDescriptionDlg();
+		}
+		break;
+
 	case IDM_NEXTMSG:
 		GoMessage(1);
 		break;
@@ -3693,6 +3706,21 @@ void SciTEBase::RemoteSync() {
 		if (jobQueue.HasCommandToRun())
 			Execute();
 	}
+}
+
+void SciTEBase::ExportExe() {
+	if (SaveIfUnsureForBuilt() == saveCancelled) {
+		return;
+	}
+	AddCommand(props.GetString("command.exportexe"), "../export", SubsystemType("command.exportexe.subsystem."), "", 0);
+	if (jobQueue.HasCommandToRun())
+		Execute();
+}
+
+void SciTEBase::CreateGist() {
+	AddCommand(props.GetString("command.exportgist"), "../export", SubsystemType("command.exportgist.subsystem."), "", 0);
+	if (jobQueue.HasCommandToRun())
+		Execute();
 }
 
 void SciTEBase::FoldChanged(int line, int levelNow, int levelPrev) {
@@ -4134,6 +4162,10 @@ void SciTEBase::CheckMenus() {
 	EnableAMenuItem(IDM_GO, //!jobQueue.IsExecuting() &&
 	        props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()).size() != 0);
 	EnableAMenuItem(IDM_GO_REMOTE, //!jobQueue.IsExecuting() &&
+	        props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()).size() != 0);
+	EnableAMenuItem(IDM_EXPORT_EXE, !jobQueue.IsExecuting() &&
+	        props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()).size() != 0);
+	EnableAMenuItem(IDM_EXPORT_GIST, !jobQueue.IsExecuting() &&
 	        props.GetWild("command.go.", FileNameExt().AsUTF8().c_str()).size() != 0);
 	EnableAMenuItem(IDM_OPENDIRECTORYPROPERTIES, props.GetInt("properties.directory.enable") != 0);
 	for (int toolItem = 0; toolItem < toolMax; toolItem++)

@@ -37,8 +37,8 @@ inline long LongFromTwoShorts(short a,short b) {
  */
 enum {
     menuFile = 0, menuEdit = 1, menuSearch = 2, menuView = 3,
-    menuTools = 4, menuOptions = 5, menuLanguage = 6, menuBuffers = 7,
-    menuHelp = 8
+    menuTools = 4, menuExport = 5, menuOptions = 6, menuLanguage = 7,
+	menuBuffers = 8, menuHelp = 9
 };
 
 struct SelectedRange {
@@ -789,6 +789,9 @@ protected:
 	void RemoteSync();
 	void DoGo(const std::string& host);
 	void Go();
+	void ExportExe();
+	virtual void ShowGistDescriptionDlg() = 0;
+	void CreateGist();
 	void FoldChanged(int line, int levelNow, int levelPrev);
 	void FoldChanged(int position);
 	void Expand(int &line, bool doExpand, bool force = false,

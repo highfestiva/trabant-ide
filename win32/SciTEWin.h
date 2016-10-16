@@ -211,6 +211,7 @@ protected:
 	GUI::Window wFindReplace;
 	GUI::Window wParameters;
 	GUI::Window wRemoteSync;
+	GUI::Window wGistDescription;
 
 	ContentWin contents;
 	BackgroundStrip backgroundStrip;
@@ -354,6 +355,10 @@ protected:
 	BOOL RemoteSyncMessage(HWND hDlg, UINT message, WPARAM wParam);
 	static BOOL CALLBACK RemoteSyncDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	virtual void ShowRemoteSyncDlg(bool isRun);
+
+	BOOL GistDescriptionMessage(HWND hDlg, UINT message, WPARAM wParam);
+	static BOOL CALLBACK GistDescriptionDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+	virtual void ShowGistDescriptionDlg();
 
 	void RestorePosition();
 

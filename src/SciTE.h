@@ -141,6 +141,9 @@
 #define IDM_STATUSWIN		353
 #define IDM_TABWIN			354
 
+#define IDM_EXPORT_EXE		360
+#define IDM_EXPORT_GIST		361
+
 // Options
 #define IDM_SPLITVERTICAL		401
 #define IDM_VIEWSPACE		402
@@ -259,6 +262,7 @@
 // high_festiva was here
 #define IDREMOTEHOST		290
 #define IDREMOTERUN		291
+#define IDDESCRIPTION		294
 
 #define IDPARAMSTART		300
 

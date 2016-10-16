@@ -139,6 +139,9 @@ bool SciTEWin::ModelessHandler(MSG *pmsg) {
 	if (DialogHandled(wRemoteSync.GetID(), pmsg)) {
 		return true;
 	}
+	if (DialogHandled(wGistDescription.GetID(), pmsg)) {
+		return true;
+	}
 	if (wParameters.GetID()) {
 		// Allow commands, such as Ctrl+1 to be active while the Parameters dialog is
 		// visible so that a group of commands can be easily run with differing parameters.
@@ -1797,4 +1800,60 @@ void SciTEWin::ShowRemoteSyncDlg(bool isRun) {
 	wRemoteSync = ::CreateDialogParam(hInstance, TEXT("RemoteSync"), MainHWND(),
 		reinterpret_cast<DLGPROC>(RemoteSyncDlg), reinterpret_cast<sptr_t>(this));
 	wRemoteSync.Show();
+}
+
+
+BOOL SciTEWin::GistDescriptionMessage(HWND hDlg, UINT message, WPARAM wParam) {
+	if (WM_SETFONT == message || WM_NCDESTROY == message)
+		return FALSE;
+	Dialog dlg(hDlg);
+
+	switch (message) {
+
+	case WM_INITDIALOG:
+		LocaliseDialog(hDlg);
+		dlg.SetItemTextU(IDDESCRIPTION, props.GetString("gist.description"));
+		return TRUE;
+
+	case WM_CLOSE:
+		::SendMessage(hDlg, WM_COMMAND, IDCANCEL, 0);
+		break;
+
+	case WM_COMMAND:
+		int cmd = ControlIDOfWParam(wParam);
+		if (cmd == IDCANCEL) {
+			::EndDialog(hDlg, IDCANCEL);
+			wGistDescription.Destroy();
+			return FALSE;
+
+		} else if (cmd == IDOK) {
+			std::string description = dlg.ItemTextU(IDDESCRIPTION);
+			if (description.empty()) {
+				return FALSE;
+			}
+			props.Set("gist.description", description.c_str());
+			CreateGist();
+			::EndDialog(hDlg, cmd);
+			wGistDescription.Destroy();
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+BOOL CALLBACK SciTEWin::GistDescriptionDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+	return Caller(hDlg, message, lParam)->GistDescriptionMessage(hDlg, message, wParam);
+}
+
+void SciTEWin::ShowGistDescriptionDlg() {
+	if (wGistDescription.Created()) {
+		HWND hDlg = reinterpret_cast<HWND>(wGistDescription.GetID());
+		Dialog dlg(hDlg);
+		::SetFocus(hDlg);
+		return;
+	}
+	wGistDescription = ::CreateDialogParam(hInstance, TEXT("GistDescription"), MainHWND(),
+		reinterpret_cast<DLGPROC>(GistDescriptionDlg), reinterpret_cast<sptr_t>(this));
+	wGistDescription.Show();
 }

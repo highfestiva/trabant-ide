@@ -23,7 +23,7 @@
 #endif
 
 #ifdef STATIC_BUILD
-const GUI::gui_char appName[] = GUI_TEXT("TrabantIDE");
+const GUI::gui_char appName[] = GUI_TEXT("TrabantIDE 1.0");
 #else
 const GUI::gui_char appName[] = GUI_TEXT("SciTE");
 #endif
